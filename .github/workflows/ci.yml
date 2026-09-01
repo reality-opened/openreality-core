@@ -1,0 +1,19 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      # The full stack needs torch + a CUDA box; CI guards what it can cheaply:
+      # every module byte-compiles and the package installs standalone.
+      - run: python -m compileall -q vggt_slam main.py visualize_results.py
+      - run: pip install --no-deps -e . && python -c "import vggt_slam; print(vggt_slam.__name__)"
